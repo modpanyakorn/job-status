@@ -1,146 +1,338 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Job Dashboard</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background: #f5f5f5;
-  }
-  .tabs {
-    display: flex;
-    margin-bottom: 20px;
-  }
-  .tabs button {
-    flex: 1;
-    padding: 10px;
-    margin-right: 5px;
-    border: none;
-    background: #ddd;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .tabs button.active {
-    background: #4CAF50;
-    color: white;
-  }
-  .job-list button {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 10px;
-    border: none;
-    background: white;
-    text-align: left;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  .job-detail {
-    background: white;
-    padding: 15px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-top: 20px;
-  }
-  .applicants button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 5px;
-    border: 1px solid #ccc;
-    background: #fafafa;
-    text-align: left;
-    cursor: default;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Job Tabs with Profile & Clients</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f8f9fa;
+    }
+ 
+    /* โปรไฟล์ */
+    .profile-card {
+      width: 70%;
+      margin: 0 auto 30px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+ 
+    .profile-header {
+      display: flex;
+      align-items: center;
+    }
+ 
+    .profile-img img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 20px;
+    }
+ 
+    .profile-info h3 {
+      margin: 0;
+      font-size: 22px;
+    }
+ 
+    .profile-info p {
+      margin: 5px 0;
+      color: #666;
+    }
+ 
+    /* ปุ่มสถานะด้านบน */
+    .status-boxes {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0 30px 20px;
+    }
+ 
+    .status-box {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      background-color: #f0f0f0;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+ 
+    .status-box.active {
+      background-color: dodgerblue;
+      color: white;
+      border-color: dodgerblue;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    }
+ 
+    /* job list */
+    .job-list {
+      display: none;
+    }
+ 
+    .job-list.active {
+      display: block;
+    }
+ 
+    /* การ์ดงาน */
+    .job-card {
+      width: 60%;
+      margin: 10px auto;
+      padding: 15px 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+ 
+    .job-card:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+ 
+    /* วงกลมสถานะ + ข้อความ */
+    .status-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+ 
+    .status-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+ 
+    .hired-status {
+      background-color: green;
+    }
+ 
+    .not-hired-status {
+      background-color: red;
+    }
+ 
+    /* รายชื่อลูกค้า */
+    .client-list {
+      width: 55%;
+      margin: -5px auto 15px auto;
+      padding: 10px 15px;
+      background: #f1f1f1;
+      border-left: 4px solid #ccc;
+      border-radius: 6px;
+      display: none;
+    }
+ 
+    .client-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+    }
+ 
+    .client-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+ 
+    .client-info img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+ 
+    .view-profile {
+      padding: 6px 12px;
+      background: dodgerblue;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+ 
+    .view-profile:hover {
+      background: royalblue;
+    }
+  </style>
 </head>
 <body>
-
-<div class="tabs">
-  <button id="postedBtn" class="active">งานที่ว่าจ้าง</button>
-  <button id="appliedBtn">งานที่สมัคร</button>
-</div>
-
-<div class="job-list" id="jobList">
-  <!-- Buttons งานจะถูกเพิ่มโดย JS -->
-</div>
-
-<div class="job-detail" id="jobDetail" style="display:none;">
-  <h3 id="jobTitle"></h3>
-  <p id="jobDescription"></p>
-  <p><strong>กำหนดเวลา:</strong> <span id="jobDeadline"></span></p>
-  <h4>ผู้จ้างวาน/ผู้รับงาน:</h4>
-  <div class="applicants" id="applicantList">
-    <!-- รายชื่อผู้รับงาน -->
+ 
+  <!-- โปรไฟล์ -->
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-img">
+        <img src="https://us-fbcloud.net/picpost/data/333/333164-5c3c833cb28c3.jpg" alt="Profile Image">
+      </div>
+      <div class="profile-info">
+        <h3>Sorrawich Pao</h3>
+        <p>ตำแหน่ง: Full Stack Developer</p>
+        <p>อีเมล: example@email.com</p>
+      </div>
+    </div>
   </div>
-</div>
-
-<script>
-  const jobsPosted = [
-    { id: 1, title: "เอกสารคณะแพทย์", description: "Create Authenticate API", deadline: "2025-09-15", applicants: ["John Doe", "Johny Den"] },
-    { id: 2, title: "เอกสารคณะแพทย์", description: "Design IT web", deadline: "2025-09-20", applicants: ["Alice Wong"] }
-  ];
-
-  const jobsApplied = [
-    { id: 3, title: "เอกสารคณะวิทยาศาสตร์", description: "Create API for REG", deadline: "2025-09-18", applicants: ["คุณ"] },
-    { id: 4, title: "เอกสารคณะวิทยาศาสตร์", description: "Design CS web", deadline: "2025-09-22", applicants: ["คุณ"] },
-    { id: 5, title: "เอกสารคณะวิทยาศาสตร์", description: "Create Full Stack Web of E-commerce", deadline: "2025-09-30", applicants: ["คุณ"] }
-  ];
-
-  const jobListEl = document.getElementById("jobList");
-  const jobDetailEl = document.getElementById("jobDetail");
-  const jobTitleEl = document.getElementById("jobTitle");
-  const jobDescriptionEl = document.getElementById("jobDescription");
-  const jobDeadlineEl = document.getElementById("jobDeadline");
-  const applicantListEl = document.getElementById("applicantList");
-
-  let currentJobs = jobsPosted;
-
-  function renderJobs() {
-    jobListEl.innerHTML = "";
-    currentJobs.forEach(job => {
-      const btn = document.createElement("button");
-      btn.textContent = job.title;
-      btn.onclick = () => showJobDetail(job);
-      jobListEl.appendChild(btn);
-    });
-    jobDetailEl.style.display = "none";
-  }
-
-  function showJobDetail(job) {
-    jobTitleEl.textContent = job.title;
-    jobDescriptionEl.textContent = job.description;
-    jobDeadlineEl.textContent = job.deadline;
-
-    applicantListEl.innerHTML = "";
-    job.applicants.forEach(name => {
-      const btn = document.createElement("button");
-      btn.textContent = name;
-      applicantListEl.appendChild(btn);
-    });
-
-    jobDetailEl.style.display = "block";
-  }
-
-  document.getElementById("postedBtn").onclick = () => {
-    currentJobs = jobsPosted;
-    document.getElementById("postedBtn").classList.add("active");
-    document.getElementById("appliedBtn").classList.remove("active");
-    renderJobs();
-  }
-
-  document.getElementById("appliedBtn").onclick = () => {
-    currentJobs = jobsApplied;
-    document.getElementById("appliedBtn").classList.add("active");
-    document.getElementById("postedBtn").classList.remove("active");
-    renderJobs();
-  }
-
-  // เริ่มต้นแสดงงานที่ว่าจ้าง
-  renderJobs();
-</script>
-
+ 
+  <!-- ปุ่มเลือก -->
+  <div class="status-boxes">
+    <div class="status-box active" onclick="showJobs('hired', this)">งานที่ว่าจ้าง</div>
+    <div class="status-box" onclick="showJobs('applied', this)">งานที่สมัคร</div>
+  </div>
+ 
+  <!-- งานที่ว่าจ้าง -->
+  <div id="hired" class="job-list active">
+    <div class="job-card" onclick="toggleClients('clients1')">
+      เอกสารคณะแพทย์
+      <div class="status-label">
+        <span class="status-circle hired-status"></span>
+      </div>
+    </div>
+    <div id="clients1" class="client-list">
+      <div class="client-item">
+        <div class="client-info">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="client">
+          <span>คุณสมชาย</span>
+        </div>
+        <button class="view-profile">ดูโปรไฟล์</button>
+      </div>
+      <div class="client-item">
+        <div class="client-info">
+          <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="client">
+          <span>บริษัท A</span>
+        </div>
+        <button class="view-profile">ดูโปรไฟล์</button>
+      </div>
+    </div>
+ 
+    <div class="job-card" onclick="toggleClients('clients2')">
+      Design IT web
+      <div class="status-label">
+        <span class="status-circle hired-status"></span>
+      </div>
+    </div>
+    <div id="clients2" class="client-list">
+      <div class="client-item">
+        <div class="client-info">
+          <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="client">
+          <span>คุณสมหญิง</span>
+        </div>
+        <button class="view-profile">ดูโปรไฟล์</button>
+      </div>
+    </div>
+ 
+    <div class="job-card" onclick="toggleClients('clients3')">
+      Swagger Upload Service
+      <div class="status-label">
+        <span class="status-circle hired-status"></span>
+      </div>
+    </div>
+    <div id="clients3" class="client-list">
+      <div class="client-item">
+        <div class="client-info">
+          <img src="https://randomuser.me/api/portraits/men/54.jpg" alt="client">
+          <span>คุณอนันต์</span>
+        </div>
+        <button class="view-profile">ดูโปรไฟล์</button>
+      </div>
+    </div>
+ 
+    <div class="job-card" onclick="toggleClients('clients4')">
+      ระบบ E-Learning Platform
+      <div class="status-label">
+        <span class="status-circle hired-status"></span>
+      </div>
+    </div>
+    <div id="clients4" class="client-list">
+      <div class="client-item">
+        <div class="client-info">
+          <img src="https://randomuser.me/api/portraits/men/77.jpg" alt="client">
+          <span>มหาวิทยาลัย X</span>
+        </div>
+        <button class="view-profile">ดูโปรไฟล์</button>
+      </div>
+      <div class="client-item">
+        <div class="client-info">
+          <img src="https://randomuser.me/api/portraits/women/66.jpg" alt="client">
+          <span>คุณสุชาดา</span>
+        </div>
+        <button class="view-profile">ดูโปรไฟล์</button>
+      </div>
+    </div>
+ 
+    <div class="job-card" onclick="toggleClients('clients5')">
+      ระบบ CRM สำหรับบริษัท
+      <div class="status-label">
+        <span class="status-circle hired-status"></span>
+      </div>
+    </div>
+    <div id="clients5" class="client-list">
+      <div class="client-item">
+        <div class="client-info">
+          <img src="https://randomuser.me/api/portraits/men/88.jpg" alt="client">
+          <span>บริษัท GlobalTech</span>
+        </div>
+        <button class="view-profile">ดูโปรไฟล์</button>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- งานที่สมัคร -->
+  <div id="applied" class="job-list">
+    <div class="job-card">
+      Create Authenticate API
+      <div class="status-label">
+        <span class="status-circle not-hired-status"></span> ยังไม่อนุมัติ
+      </div>
+    </div>
+    <div class="job-card">
+      ออกแบบระบบ IT ภายใน
+      <div class="status-label">
+        <span class="status-circle hired-status"></span> อนุมัติแล้ว
+      </div>
+    </div>
+    <div class="job-card">
+      Frontend React Dashboard
+      <div class="status-label">
+        <span class="status-circle not-hired-status"></span> ยังไม่อนุมัติ
+      </div>
+    </div>
+    <div class="job-card">
+      Mobile Application UX Design
+      <div class="status-label">
+        <span class="status-circle hired-status"></span> อนุมัติแล้ว
+      </div>
+    </div>
+    <div class="job-card">
+      Database Migration Project
+      <div class="status-label">
+        <span class="status-circle not-hired-status"></span> ยังไม่อนุมัติ
+      </div>
+    </div>
+  </div>
+ 
+  <script>
+    function showJobs(type, element) {
+      document.querySelectorAll('.job-list').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.status-box').forEach(el => el.classList.remove('active'));
+      document.getElementById(type).classList.add('active');
+      element.classList.add('active');
+    }
+ 
+    function toggleClients(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "block" ? "none" : "block";
+    }
+  </script>
+ 
 </body>
 </html>
